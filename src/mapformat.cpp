@@ -16,6 +16,41 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+MapFormat* mapformat_a_create_function(unsigned int width, unsigned int height)
+{
+	MapFormat* data = new MapFormat;
+
+	if (!data)
+	{
+		#if defined(DEBUG)
+		fprintf(stderr, "Unable to allocate new MapFormat memory chunk!\n");
+		#endif
+		return 0;
+	}
+
+	data->width = width;
+	data->height = height;
+
+	unsigned int bytes = data->width * data->height;
+	data->tilevalue = new unsigned int [bytes];
+	if (!data->tilevalue)
+	{
+		#if defined(DEBUG)
+		fprintf(stderr, "Unable to allocate new unsigned int memory chunk of %d element!\n", bytes);
+		#endif
+		return 0;
+	}
+
+	for (unsigned int index = 0; index < bytes; index++)
+	{
+		data->tilevalue[index] = 0;
+	}
+
+	return data;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 MapFormat* mapformat_a_load_function(const char* filename)
 {
 	MapFormat* data = new MapFormat;

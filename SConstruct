@@ -23,6 +23,7 @@ projectConfig['library path'] = Split("""
 ## if you need to link against other libs, add them here
 projectConfig['libraries'] = Split("""
 	SDL_image
+	SDL_ttf
 	""") + buildEnv['LIBS']
 ################################################################################
 ## add your sources for your project here
