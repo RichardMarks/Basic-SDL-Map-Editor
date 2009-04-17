@@ -12,7 +12,6 @@ struct SDL_Surface;
 struct SDL_Rect;
 struct _TTF_Font;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 extern bool editor_init(int argc, char* argv[]);
@@ -62,9 +61,9 @@ extern unsigned int editortilewidth;
 extern unsigned int editortileheight;
 extern unsigned char* editorkeys;
 extern bool editorrunning;
-
-
 extern int editornumkeys;
 extern bool* editorkeywaspressed;
+
+extern bool editorshowtileselector;
 
 #endif

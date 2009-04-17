@@ -41,6 +41,9 @@
 		<Unit filename="include/mapformat.h">
 			<Option virtualFolder="Editor Source/Map Format/" />
 		</Unit>
+		<Unit filename="include/selector.h">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
 		<Unit filename="readme.txt">
 			<Option virtualFolder="Text Files/" />
 		</Unit>
@@ -52,6 +55,9 @@
 		</Unit>
 		<Unit filename="src/mapformat.cpp">
 			<Option virtualFolder="Editor Source/Map Format/" />
+		</Unit>
+		<Unit filename="src/selector.cpp">
+			<Option virtualFolder="Editor Source/" />
 		</Unit>
 		<Extensions>
 			<code_completion />

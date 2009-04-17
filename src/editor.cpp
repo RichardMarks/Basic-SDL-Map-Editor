@@ -25,6 +25,7 @@
 // EDITOR
 #include "editor.h"
 #include "mapformat.h"
+#include "selector.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // function pointers for handling the map format
@@ -76,7 +77,7 @@ unsigned int editorcurrentile											= 0;
 bool editorrunning														= false;
 int editornumkeys														= 0;
 bool* editorkeywaspressed												= 0;
-
+bool editorshowtileselector												= false;
 ////////////////////////////////////////////////////////////////////////////////
 
 bool editor_init(int argc, char* argv[])
@@ -120,7 +121,7 @@ bool editor_init(int argc, char* argv[])
 	}
 
 	// set the window caption
-	SDL_WM_SetCaption("Basic SDL Map Editor v0.0.1 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
+	SDL_WM_SetCaption("Basic SDL Map Editor v0.0.2 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
 
 	// create the SDL event handler instance
 	editorevent = new SDL_Event;
@@ -185,6 +186,14 @@ bool editor_init(int argc, char* argv[])
 	{
 		editorkeywaspressed[index] = false;
 	}
+
+
+	if (!selector_init(editortileset))
+	{
+		return false;
+	}
+
+
 	editorrunning = true;
 	return true;
 }
@@ -193,6 +202,8 @@ bool editor_init(int argc, char* argv[])
 
 void editor_destroy()
 {
+	selector_destroy();
+
 	#define _TMP_DELRES(o) if (o){delete o;o=0;}
 
 	_TMP_DELRES(editorcamera)
@@ -228,11 +239,31 @@ void editor_execute()
 			{
 				editorrunning = false;
 			}
+			else if (SDL_MOUSEBUTTONDOWN == editorevent->type)
+			{
+				if (editorshowtileselector)
+				{
+					if (SDL_BUTTON_WHEELUP == editorevent->button.button)
+					{
+						selector_scroll_up();
+					}
+					else if (SDL_BUTTON_WHEELDOWN == editorevent->button.button)
+					{
+						selector_scroll_down();
+					}
+				}
+			}
 		}
 
 		editor_handle_input();
 		editor_refresh_view();
 
+		if (editorshowtileselector)
+		{
+			selector_refresh_view();
+		}
+
+		SDL_Flip(editorscreen);
 		SDL_Delay(30);
 	}
 }
@@ -284,8 +315,16 @@ void editor_draw_tile(int tileid, int x, int y)
 	SDL_Rect src;
 	SDL_Rect dst;
 	static int tilesperrow = (editortileset->w / editortilewidth);
+
+	#if 0
 	src.x = (tileid % tilesperrow) * editortilewidth;
 	src.y = (tileid / tilesperrow) * editortileheight;
+	#endif
+	int tilemodperrow = (tileid % tilesperrow);
+	int tileoverperrow = (tileid / tilesperrow);
+	src.x = 1 + tilemodperrow + (tilemodperrow * editortilewidth);
+	src.y = 1 + tileoverperrow + (tileoverperrow * editortileheight);
+
 	src.w = editortilewidth;
 	src.h = editortileheight;
 	dst.x = editortilewidth + (x * editortilewidth) - (editorcamera->x * editortilewidth);
@@ -348,8 +387,17 @@ void editor_refresh_view()
 		SDL_Rect src;
 		SDL_Rect dst;
 		static int tilesperrow = (editortileset->w / editortilewidth);
+		#if 0
 		src.x = (editorcurrentile % tilesperrow) * editortilewidth;
 		src.y = (editorcurrentile / tilesperrow) * editortileheight;
+		#endif
+
+		int tilemodperrow = (editorcurrentile % tilesperrow);
+		int tileoverperrow = (editorcurrentile / tilesperrow);
+		src.x = 1 + tilemodperrow + (tilemodperrow * editortilewidth);
+		src.y = 1 + tileoverperrow + (tileoverperrow * editortileheight);
+
+
 		src.w = editortilewidth;
 		src.h = editortileheight;
 		dst.x = editortilewidth + (editormousetilex * editortilewidth);
@@ -378,8 +426,6 @@ void editor_refresh_view()
 		"( or ) to select a tile.                (C) Copyright 2009, Richard Marks <ccpsceo@gmail.com>");
 
 
-
-	SDL_Flip(editorscreen);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -417,6 +463,26 @@ void editor_handle_input()
 				}
 			}
 			editorkeywaspressed[SDLK_n] = false;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	// toggle tile selector panel
+	////////////////////////////////////////////////////////////////////////////
+	if (editorkeys[SDLK_TAB])
+	{
+		if (!editorkeywaspressed[SDLK_TAB])
+		{
+			editorkeywaspressed[SDLK_TAB] = true;
+		}
+	}
+	else
+	{
+		if (editorkeywaspressed[SDLK_TAB])
+		{
+			editorshowtileselector = !editorshowtileselector;
+			selector_redraw_tile_selection_panel();
+			editorkeywaspressed[SDLK_TAB] = false;
 		}
 	}
 
@@ -507,7 +573,14 @@ void editor_handle_input()
 	////////////////////////////////////////////////////////////////////////////
 	if (editorkeys[SDLK_UP] || editorkeys[SDLK_w])
 	{
-		editor_move_camera_up();
+		if (editorshowtileselector)
+		{
+			selector_scroll_up();
+		}
+		else
+		{
+			editor_move_camera_up();
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -515,7 +588,14 @@ void editor_handle_input()
 	////////////////////////////////////////////////////////////////////////////
 	if (editorkeys[SDLK_DOWN] || editorkeys[SDLK_s])
 	{
-		editor_move_camera_down();
+		if (editorshowtileselector)
+		{
+			selector_scroll_down();
+		}
+		else
+		{
+			editor_move_camera_down();
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -523,7 +603,10 @@ void editor_handle_input()
 	////////////////////////////////////////////////////////////////////////////
 	if (editorkeys[SDLK_LEFT] || editorkeys[SDLK_a])
 	{
-		editor_move_camera_left();
+		if (!editorshowtileselector)
+		{
+			editor_move_camera_left();
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -531,7 +614,10 @@ void editor_handle_input()
 	////////////////////////////////////////////////////////////////////////////
 	if (editorkeys[SDLK_RIGHT] || editorkeys[SDLK_d])
 	{
-		editor_move_camera_right();
+		if (!editorshowtileselector)
+		{
+			editor_move_camera_right();
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -540,27 +626,107 @@ void editor_handle_input()
 	int mousex, mousey;
 	unsigned int mouseb = SDL_GetMouseState(&mousex, &mousey);
 
-
-	if (
-		(unsigned int)mousex >= editortilewidth && (unsigned int)mousex <= ((1 + editorcamera->w) * editortilewidth) &&
-		(unsigned int)mousey >= editortileheight && (unsigned int)mousey <= ((1 + editorcamera->h) * editortileheight))
+	if (!editorshowtileselector)
 	{
-		SDL_ShowCursor(SDL_DISABLE);
-		editormousetilex = editorcamera->x + ((mousex - editortilewidth) / editortilewidth);
-		editormousetiley = editorcamera->y + ((mousey - editortileheight) / editortileheight);
+		if (
+			(unsigned int)mousex >= editortilewidth && (unsigned int)mousex <= ((1 + editorcamera->w) * editortilewidth) &&
+			(unsigned int)mousey >= editortileheight && (unsigned int)mousey <= ((1 + editorcamera->h) * editortileheight))
+		{
+			SDL_ShowCursor(SDL_DISABLE);
+			editormousetilex = editorcamera->x + ((mousex - editortilewidth) / editortilewidth);
+			editormousetiley = editorcamera->y + ((mousey - editortileheight) / editortileheight);
 
-		if (mouseb & SDL_BUTTON(1))
-		{
-			editorlevel->tilevalue[editormousetilex + (editormousetiley * editorlevelwidth)] = editorcurrentile;
+			if (mouseb & SDL_BUTTON(1))
+			{
+				editorlevel->tilevalue[editormousetilex + (editormousetiley * editorlevelwidth)] = editorcurrentile;
+			}
+			else if (mouseb & SDL_BUTTON(3))
+			{
+				editorlevel->tilevalue[editormousetilex + (editormousetiley * editorlevelwidth)] = 0;
+			}
 		}
-		else if (mouseb & SDL_BUTTON(3))
+		else
 		{
-			editorlevel->tilevalue[editormousetilex + (editormousetiley * editorlevelwidth)] = 0;
+			SDL_ShowCursor(SDL_ENABLE);
 		}
 	}
 	else
 	{
-		SDL_ShowCursor(SDL_ENABLE);
+		// tile selector mouse logic
+		if (!SDL_ShowCursor(SDL_QUERY))
+		{
+			SDL_ShowCursor(SDL_ENABLE);
+		}
+
+		if (mouseb & SDL_BUTTON(3))
+		{
+			editorcurrentile = selectortileselected;
+			editorshowtileselector = false;
+			selectormouseclicks = 0;
+		}
+
+		if (
+			(unsigned int)mousex >= (editortilewidth*2) && (unsigned int)mousex <= (22 * editortilewidth) &&
+			(unsigned int)mousey >= (editortileheight*2) && (unsigned int)mousey <= (14 * editortileheight))
+		{
+			selectormousetilex = ((mousex - ( 2 * editortilewidth)) / editortilewidth);
+			selectormousetiley = (selectorscroll / editortileheight) + ((mousey - (2 * editortileheight)) / editortileheight);
+			selectormousex = mousex;
+			selectormousey = mousey;
+
+			#if 1
+			// if we have not clicked already
+			if (!selectorlmbclicked)
+			{
+				// check for left mouse button being down
+				if (mouseb & SDL_BUTTON(1))
+				{
+					// its down
+					selectorlmbdown = true;
+				}
+
+				// check for left mouse button being up
+				if (!(mouseb & SDL_BUTTON(1)))
+				{
+					// its up
+					if (selectorlmbdown)
+					{
+						// we clicked
+						selectorlmbclicked 	= true;
+						selectorlmbdown 	= false;
+					}
+				}
+			}
+			else
+			{
+				// we have clicked
+				selectorlmbclicked	= false;
+				selectorlmbdown		= false;
+
+				if (!selectormouseclicks)
+				{
+					// no clicks, so lets select the tile and up the click count
+					selectortileselected = selectortileundermouse;
+					selectormouseclicks++;
+				}
+				else
+				{
+					//
+					if (selectortileundermouse != selectortileselected)
+					{
+						selectormouseclicks = 1;
+						selectortileselected = selectortileundermouse;
+					}
+					else
+					{
+						editorcurrentile = selectortileselected;
+						editorshowtileselector = false;
+						selectormouseclicks = 0;
+					}
+				}
+			}
+			#endif
+		}
 	}
 }
 

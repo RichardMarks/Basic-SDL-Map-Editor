@@ -1,3 +1,4 @@
 # changes.txt
-# Project Name
-# any changes to the project should be logged here
+# Basic SDL Map Editor
+# developed by Richard Marks <ccpsceo@gmail.com>
+
