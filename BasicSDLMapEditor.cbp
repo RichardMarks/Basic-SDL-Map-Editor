@@ -6,7 +6,7 @@
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editor Source/;SCONS BUILD SCRIPTS/;Text Files/;Editor Source/Map Format/;" />
+		<Option virtualFolders="Editor Source/;SCONS BUILD SCRIPTS/;Text Files/;Editor Source/Map Format/;Editor Source/Editor Modes/;" />
 		<Build>
 			<Target title="SConS">
 				<Option output="release/BasicSDLMapEditorExe" prefix_auto="0" extension_auto="0" />
@@ -35,6 +35,9 @@
 		<Unit filename="changes.txt">
 			<Option virtualFolder="Text Files/" />
 		</Unit>
+		<Unit filename="include/common_includes.h">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
 		<Unit filename="include/editor.h">
 			<Option virtualFolder="Editor Source/" />
 		</Unit>
@@ -48,6 +51,33 @@
 			<Option virtualFolder="Text Files/" />
 		</Unit>
 		<Unit filename="src/editor.cpp">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
+		<Unit filename="src/editor_bgeditor.cpp">
+			<Option virtualFolder="Editor Source/Editor Modes/" />
+		</Unit>
+		<Unit filename="src/editor_cdeditor.cpp">
+			<Option virtualFolder="Editor Source/Editor Modes/" />
+		</Unit>
+		<Unit filename="src/editor_common_input.cpp">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
+		<Unit filename="src/editor_create.cpp">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
+		<Unit filename="src/editor_destroy.cpp">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
+		<Unit filename="src/editor_fgeditor.cpp">
+			<Option virtualFolder="Editor Source/Editor Modes/" />
+		</Unit>
+		<Unit filename="src/editor_init.cpp">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
+		<Unit filename="src/editor_render_common.cpp">
+			<Option virtualFolder="Editor Source/" />
+		</Unit>
+		<Unit filename="src/globals.cpp">
 			<Option virtualFolder="Editor Source/" />
 		</Unit>
 		<Unit filename="src/main.cpp">

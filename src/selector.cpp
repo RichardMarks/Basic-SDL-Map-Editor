@@ -28,25 +28,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool selectorlmbdown								= false;
-bool selectorlmbclicked								= false;
-unsigned int selectormouseclicks					= 0;
-unsigned int selectortileundermouse					= 0;
-unsigned int selectortileselected					= 0;
-unsigned int selectortilecount						= 0;
-unsigned int selectortilesacross					= 0;
-unsigned int selectortilesdown						= 0;
-unsigned int selectorscroll							= 0;
-unsigned int selectorpanelwidth						= 0;
-unsigned int selectorpanelheight					= 0;
-unsigned int selectormousetilex						= 0;
-unsigned int selectormousetiley						= 0;
-int selectormousex									= 0;
-int selectormousey									= 0;
-SDL_Surface* selectortileselectionpanel				= 0;
-SDL_Surface* selectorsharedtileset					= 0;
-SDL_Surface* selectorhelptextsurface				= 0;
-SDL_Rect* selectorpanelview							= 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 
