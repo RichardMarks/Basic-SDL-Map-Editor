@@ -72,6 +72,7 @@ void editor_destroy_gui_elements()
 	_TMP_DELRES(editorcdlayermodebuttonsurface)
 	_TMP_DELRES(editorcollisionoverlaysurface)
 	_TMP_DELRES(editorshowselectorbuttonsurface)
+	_TMP_DELRES(editorsavebmpbuttonsurface)
 
 	#undef _TMP_DELRES
 }

@@ -71,6 +71,7 @@ SDL_Surface* editorbglayermodebuttonsurface		= 0;
 SDL_Surface* editorfglayermodebuttonsurface		= 0;
 SDL_Surface* editorcdlayermodebuttonsurface		= 0;
 SDL_Surface* editorshowselectorbuttonsurface	= 0;
+SDL_Surface* editorsavebmpbuttonsurface			= 0;
 SDL_Surface* editorcursorsurface				= 0;
 
 

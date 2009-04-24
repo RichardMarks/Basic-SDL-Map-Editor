@@ -47,7 +47,7 @@ bool editor_init(int argc, char* argv[])
 	}
 
 	// set the window caption
-	SDL_WM_SetCaption("Basic SDL Map Editor v0.0.4 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
+	SDL_WM_SetCaption("Basic SDL Map Editor v0.0.5 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
 
 	// create the SDL event handler instance
 	editorevent = new SDL_Event;

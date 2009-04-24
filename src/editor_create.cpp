@@ -174,6 +174,8 @@ void editor_create_gui_elements()
 	editorfglayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
 	editorcdlayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
 	editorshowselectorbuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editorsavebmpbuttonsurface		= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+
 
 	editorcollisionoverlaysurface	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, editortilewidth, editortileheight, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -184,7 +186,8 @@ void editor_create_gui_elements()
 		!editorfglayermodebuttonsurface ||
 		!editorcdlayermodebuttonsurface ||
 		!editorcollisionoverlaysurface ||
-		!editorshowselectorbuttonsurface)
+		!editorshowselectorbuttonsurface ||
+		!editorsavebmpbuttonsurface)
 	{
 		fprintf(stderr, "GUI elements could not be created!\n");
 		exit(1);
@@ -224,6 +227,9 @@ void editor_create_gui_elements()
 	SDL_FillRect(editorfglayermodebuttonsurface, 0, guicolor[ButtonBG]);
 	SDL_FillRect(editorcdlayermodebuttonsurface, 0, guicolor[ButtonBG]);
 	SDL_FillRect(editorshowselectorbuttonsurface, 0, guicolor[ButtonBG]);
+	SDL_FillRect(editorsavebmpbuttonsurface, 0, guicolor[ButtonBG]);
+
+
 
 	SDL_Rect border;
 
@@ -279,6 +285,10 @@ void editor_create_gui_elements()
 	border.h = editorshowselectorbuttonsurface->h - 2;
 	SDL_FillRect(editorshowselectorbuttonsurface, &border, guicolor[ButtonBorder]);
 
+	border.w = editorsavebmpbuttonsurface->w - 2;
+	border.h = editorsavebmpbuttonsurface->h - 2;
+	SDL_FillRect(editorsavebmpbuttonsurface, &border, guicolor[ButtonBorder]);
+
 
 
 
@@ -299,6 +309,7 @@ void editor_create_gui_elements()
 	_TMP_LABELBTN(editorfglayermodebuttonsurface, "FG")
 	_TMP_LABELBTN(editorcdlayermodebuttonsurface, "CD")
 	_TMP_LABELBTN(editorshowselectorbuttonsurface, "TS")
+	_TMP_LABELBTN(editorsavebmpbuttonsurface, "SS")
 
 	#undef _TMP_LABELBTN
 
@@ -314,6 +325,8 @@ void editor_create_gui_elements()
 	SDL_BlitSurface(editorcdlayermodebuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
 	btnpos.y = 102;
 	SDL_BlitSurface(editorshowselectorbuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
+	btnpos.y = 134;
+	SDL_BlitSurface(editorsavebmpbuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

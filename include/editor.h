@@ -66,7 +66,10 @@ extern SDL_Surface* editormodebuttonpanelsurface;
 extern SDL_Surface* editorbglayermodebuttonsurface;
 extern SDL_Surface* editorfglayermodebuttonsurface;
 extern SDL_Surface* editorcdlayermodebuttonsurface;
+
 extern SDL_Surface* editorshowselectorbuttonsurface;
+extern SDL_Surface* editorsavebmpbuttonsurface;
+
 extern SDL_Surface* editorcursorsurface;
 extern SDL_Surface* editorcollisionoverlaysurface;
 

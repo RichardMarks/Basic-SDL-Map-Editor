@@ -303,13 +303,19 @@ void editor_handle_input_common()
 				  4 + EDITORGUIBUTTONPANELX,
 				102 + EDITORGUIBUTTONPANELY,
 				  4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
-				102 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT
+				102 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT,
+
+				  4 + EDITORGUIBUTTONPANELX,
+				134 + EDITORGUIBUTTONPANELY,
+				  4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
+				134 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT
 			};
 
 			bool btn1 = (mousex >=  button[0] && mousex <= button[2] && mousey >= button[1] && mousey <= button[3]);
 			bool btn2 = (mousex >=  button[4] && mousex <= button[6] && mousey >= button[5] && mousey <= button[7]);
 			bool btn3 = (mousex >=  button[8] && mousex <= button[10] && mousey >= button[9] && mousey <= button[11]);
 			bool btn4 = (mousex >= button[12] && mousex <= button[14] && mousey >= button[13] && mousey <= button[15]);
+			bool btn5 = (mousex >= button[16] && mousex <= button[18] && mousey >= button[17] && mousey <= button[19]);
 
 			if (btn1)
 			{
@@ -327,6 +333,18 @@ void editor_handle_input_common()
 			{
 				editorshowtileselector = !editorshowtileselector;
 				selector_redraw_tile_selection_panel();
+			}
+			else if (btn5)
+			{
+				// save snapshot of the map
+				if (!SDL_SaveBMP(editorbgmapsurface, "wip.bmp"))
+				{
+					fprintf(stderr, "A snapshot of the current map was taken and saved to wip.bmp\n");
+				}
+				else
+				{
+					fprintf(stderr, "Unable to save a snapshot of the map to wip.bmp!\nSDL Error: %s\n", SDL_GetError());
+				}
 			}
 		}
 	}
