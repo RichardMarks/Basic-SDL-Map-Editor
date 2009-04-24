@@ -70,6 +70,7 @@ SDL_Surface* editormodebuttonpanelsurface		= 0;
 SDL_Surface* editorbglayermodebuttonsurface		= 0;
 SDL_Surface* editorfglayermodebuttonsurface		= 0;
 SDL_Surface* editorcdlayermodebuttonsurface		= 0;
+SDL_Surface* editorshowselectorbuttonsurface	= 0;
 SDL_Surface* editorcursorsurface				= 0;
 
 
@@ -80,6 +81,8 @@ SDL_Surface* editorcdmapsurface					= 0;
 
 SDL_Surface* editorhelptextsurface				= 0;
 SDL_Surface* editorcollisionoverlaysurface		= 0;
+
+SDL_Rect* editortilecoordinates					= 0;
 
 TTF_Font* editorfont							= 0;
 

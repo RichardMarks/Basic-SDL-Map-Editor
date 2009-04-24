@@ -8,21 +8,12 @@ void editor_set_tile_bgeditor()
 {
 	editorlevel->data[editormousetilex + (editormousetiley * editorlevelwidth)].backtilevalue = editorcurrentile;
 
-	SDL_Rect src, dst;
-	static int tilesperrow = (editortileset->w / editortilewidth);
-
-	int tilemodperrow = (editorcurrentile % tilesperrow);
-	int tileoverperrow = (editorcurrentile / tilesperrow);
-
-	src.x = 1 + tilemodperrow + (tilemodperrow * editortilewidth);
-	src.y = 1 + tileoverperrow + (tileoverperrow * editortileheight);
-	src.w = editortilewidth;
-	src.h = editortileheight;
+	SDL_Rect dst;
 
 	dst.x = editormousetilex * editortilewidth;
 	dst.y = editormousetiley * editortileheight;
 
-	SDL_BlitSurface(editortileset, &src, editorbgmapsurface, &dst);
+	SDL_BlitSurface(editortileset, &editortilecoordinates[editorcurrentile], editorbgmapsurface, &dst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,17 +22,12 @@ void editor_unset_tile_bgeditor()
 {
 	editorlevel->data[editormousetilex + (editormousetiley * editorlevelwidth)].backtilevalue = 0;
 
-	SDL_Rect src, dst;
-
-	src.x = 1;
-	src.y = 1;
-	src.w = editortilewidth;
-	src.h = editortileheight;
+	SDL_Rect dst;
 
 	dst.x = editormousetilex * editortilewidth;
 	dst.y = editormousetiley * editortileheight;
 
-	SDL_BlitSurface(editortileset, &src, editorbgmapsurface, &dst);
+	SDL_BlitSurface(editortileset, &editortilecoordinates[0], editorbgmapsurface, &dst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

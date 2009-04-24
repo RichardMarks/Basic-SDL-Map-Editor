@@ -36,8 +36,10 @@ void editor_refresh_view_common()
 		editortilewidth + 4,
 		editortileheight - 14,
 		editortextcolor,
-		"Mouse Tile X %3d/%3d | Mouse Tile Y %3d/%3d | Camera X %3d | Camera Y %3d | "
+		"%s | Mouse Tile X %3d/%3d | Mouse Tile Y %3d/%3d | Camera X %3d | Camera Y %3d | "
 		"Camera Width %2d | Camera Height %2d | Tile 0x%04X",
+		(EditorBGEdit==editormode)?"Background Edit Mode":
+		(EditorFGEdit==editormode)?"Foreground Edit Mode":"Collision Edit Mode",
 	editormousetilex, editorlevel->width,
 	editormousetiley, editorlevel->height,
 	editorcamera->intiles->x, editorcamera->intiles->y,

@@ -46,20 +46,34 @@ void editor_create_map_surfaces()
 	unsigned int width = editorlevelwidth * editortilewidth;
 	unsigned int height = editorlevelheight * editortileheight;
 
+	#if 1
 	editorbgmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	editorfgmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	editorcdmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	//editorfgmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	//editorcdmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
 
-	if (!editorbgmapsurface || !editorfgmapsurface || !editorcdmapsurface)
+	SDL_Surface* t;
+	t = SDL_DisplayFormat(editorbgmapsurface); SDL_FreeSurface(editorbgmapsurface); editorbgmapsurface = t;
+	//t = SDL_DisplayFormat(editorfgmapsurface); SDL_FreeSurface(editorfgmapsurface); editorfgmapsurface = t;
+	//t = SDL_DisplayFormat(editorcdmapsurface); SDL_FreeSurface(editorcdmapsurface); editorcdmapsurface = t;
+
+	#endif
+
+
+	//if (!editorbgmapsurface || !editorfgmapsurface || !editorcdmapsurface)
+	if (!editorbgmapsurface)
 	{
-		fprintf(stderr, "Unable to create the map surfaces!\nSDL Error: %s\n", SDL_GetError());
+		fprintf(stderr, "Unable to create the map surface!\nSDL Error: %s\n", SDL_GetError());
 		exit(1);
 	}
 
-	SDL_FillRect(editorcdmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-	SDL_FillRect(editorfgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-	SDL_SetColorKey(editorfgmapsurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-	SDL_SetColorKey(editorcdmapsurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
+	//SDL_FillRect(editorcdmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
+	//SDL_FillRect(editorfgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
+
+	//const unsigned int transparent = SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF);
+
+	//SDL_SetColorKey(editorfgmapsurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), transparent);
+	//SDL_SetColorKey(editorcdmapsurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), transparent);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,12 +82,12 @@ void editor_create_scene()
 {
 	#if 1
 	SDL_FillRect(editorbgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0x00, 0x00, 0x00));
-	SDL_FillRect(editorfgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-	SDL_FillRect(editorcdmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
+	//SDL_FillRect(editorfgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
+	//SDL_FillRect(editorcdmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
 
 	SDL_Rect src, dst;
 
-	unsigned int tilesperrow = (editortileset->w / editortilewidth);
+	//unsigned int tilesperrow = (editortileset->w / editortilewidth);
 
 	src.w = editortilewidth;
 	src.h = editortileheight;
@@ -89,13 +103,7 @@ void editor_create_scene()
 			unsigned int index 		= column + (row * editorlevel->width);
 			unsigned int bgtileid 	= editorlevel->data[index].backtilevalue;
 
-			int bgtilemodperrow 	= (bgtileid % tilesperrow);
-			int bgtileoverperrow 	= (bgtileid / tilesperrow);
-
-			src.x = 1 + bgtilemodperrow + (bgtilemodperrow * editortilewidth);
-			src.y = 1 + bgtileoverperrow + (bgtileoverperrow * editortileheight);
-
-			SDL_BlitSurface(editortileset, &src, editorbgmapsurface, &dst);
+			SDL_BlitSurface(editortileset, &editortilecoordinates[bgtileid], editorbgmapsurface, &dst);
 		}
 	}
 
@@ -112,13 +120,7 @@ void editor_create_scene()
 			if (fgtileid)
 			{
 				fgtileid--;
-				int fgtilemodperrow 	= (fgtileid % tilesperrow);
-				int fgtileoverperrow 	= (fgtileid / tilesperrow);
-
-				src.x = 1 + fgtilemodperrow + (fgtilemodperrow * editortilewidth);
-				src.y = 1 + fgtileoverperrow + (fgtileoverperrow * editortileheight);
-
-				SDL_BlitSurface(editortileset, &src, editorfgmapsurface, &dst);
+				SDL_BlitSurface(editortileset, &editortilecoordinates[fgtileid], editorbgmapsurface, &dst);
 			}
 		}
 	}
@@ -140,7 +142,7 @@ void editor_create_scene()
 				SDL_Rect plot;
 				plot.x = dst.x - 1;
 				plot.y = dst.y - 1;
-				SDL_BlitSurface(editorcollisionoverlaysurface, 0, editorcdmapsurface, &plot);
+				SDL_BlitSurface(editorcollisionoverlaysurface, 0, editorbgmapsurface, &plot);
 			}
 		}
 	}
@@ -167,12 +169,13 @@ void editor_create_static_help_text()
 
 void editor_create_gui_elements()
 {
-	editormodebuttonpanelsurface 	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, 28, 96, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	editorbglayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	editorfglayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	editorcdlayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editormodebuttonpanelsurface 	= SDL_CreateRGBSurface(SDL_HWSURFACE, 28, editorcamera->inpixels->h+4, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editorbglayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editorfglayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editorcdlayermodebuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editorshowselectorbuttonsurface	= SDL_CreateRGBSurface(SDL_HWSURFACE, EDITORGUIBUTTONWIDTH, EDITORGUIBUTTONHEIGHT, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
 
-	editorcollisionoverlaysurface	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, editortilewidth+2, editortileheight+2, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	editorcollisionoverlaysurface	= SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, editortilewidth, editortileheight, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
 
 	SDL_SetColorKey(editorcollisionoverlaysurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
 
@@ -180,7 +183,8 @@ void editor_create_gui_elements()
 		!editorbglayermodebuttonsurface ||
 		!editorfglayermodebuttonsurface ||
 		!editorcdlayermodebuttonsurface ||
-		!editorcollisionoverlaysurface)
+		!editorcollisionoverlaysurface ||
+		!editorshowselectorbuttonsurface)
 	{
 		fprintf(stderr, "GUI elements could not be created!\n");
 		exit(1);
@@ -219,15 +223,34 @@ void editor_create_gui_elements()
 	SDL_FillRect(editorbglayermodebuttonsurface, 0, guicolor[ButtonBG]);
 	SDL_FillRect(editorfglayermodebuttonsurface, 0, guicolor[ButtonBG]);
 	SDL_FillRect(editorcdlayermodebuttonsurface, 0, guicolor[ButtonBG]);
-	SDL_FillRect(editorcollisionoverlaysurface, 0, guicolor[CollisionOverlayBorder]);
+	SDL_FillRect(editorshowselectorbuttonsurface, 0, guicolor[ButtonBG]);
 
 	SDL_Rect border;
 
-	border.x = 1;
+	#if 1
+	SDL_FillRect(editorcollisionoverlaysurface, 0, guicolor[Transparent]);
+
+	border.x = border.y = 1;
+	border.w = editortilewidth; border.h = 2;
+	SDL_FillRect(editorcollisionoverlaysurface, &border, guicolor[CollisionOverlayBorder]);
+
+	border.x = border.y = 1;
+	border.w = 2; border.h = editortileheight;
+	SDL_FillRect(editorcollisionoverlaysurface, &border, guicolor[CollisionOverlayBorder]);
+
+	border.x = editortilewidth - 2;
 	border.y = 1;
-	border.w = editorcollisionoverlaysurface->w - 2;
-	border.h = editorcollisionoverlaysurface->h - 2;
-	SDL_FillRect(editorcollisionoverlaysurface, &border, guicolor[Transparent]);
+	border.w = 2; border.h = editortileheight;
+	SDL_FillRect(editorcollisionoverlaysurface, &border, guicolor[CollisionOverlayBorder]);
+
+	border.x = 1;
+	border.y = editortileheight - 2;
+	border.w = editortilewidth; border.h = 2;
+	SDL_FillRect(editorcollisionoverlaysurface, &border, guicolor[CollisionOverlayBorder]);
+
+
+	#endif
+
 
 	border.x = 2;
 	border.y = 2;
@@ -252,6 +275,13 @@ void editor_create_gui_elements()
 	SDL_FillRect(editorcdlayermodebuttonsurface, &border, guicolor[ButtonBorder]);
 
 
+	border.w = editorshowselectorbuttonsurface->w - 2;
+	border.h = editorshowselectorbuttonsurface->h - 2;
+	SDL_FillRect(editorshowselectorbuttonsurface, &border, guicolor[ButtonBorder]);
+
+
+
+
 	SDL_Rect label;
 	label.x = 6;
 	label.y = 6;
@@ -268,18 +298,22 @@ void editor_create_gui_elements()
 	_TMP_LABELBTN(editorbglayermodebuttonsurface, "BG")
 	_TMP_LABELBTN(editorfglayermodebuttonsurface, "FG")
 	_TMP_LABELBTN(editorcdlayermodebuttonsurface, "CD")
+	_TMP_LABELBTN(editorshowselectorbuttonsurface, "TS")
 
 	#undef _TMP_LABELBTN
 
 	SDL_Rect btnpos;
 
 	btnpos.x = 4;
-	btnpos.y = 8;
+
+	btnpos.y = 6;
 	SDL_BlitSurface(editorbglayermodebuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
-	btnpos.y = 42;
+	btnpos.y = 38;
 	SDL_BlitSurface(editorfglayermodebuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
 	btnpos.y = 70;
 	SDL_BlitSurface(editorcdlayermodebuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
+	btnpos.y = 102;
+	SDL_BlitSurface(editorshowselectorbuttonsurface, 0, editormodebuttonpanelsurface, &btnpos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

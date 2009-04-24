@@ -21,8 +21,8 @@ void editor_destroy()
 
 	_TMP_DELRES(editorhelptextsurface)
 	_TMP_DELRES(editorbgmapsurface)
-	_TMP_DELRES(editorfgmapsurface)
-	_TMP_DELRES(editorcdmapsurface)
+	//_TMP_DELRES(editorfgmapsurface)
+	//_TMP_DELRES(editorcdmapsurface)
 
 	#undef _TMP_DELRES
 
@@ -35,6 +35,12 @@ void editor_destroy()
 	// release the selector
 	selector_destroy();
 
+	// release the tileset coordinate array
+	if (editortilecoordinates)
+	{
+		delete [] editortilecoordinates;
+		editortilecoordinates = 0;
+	}
 
 	// release the extended key handler
 	if (editorkeywaspressed)
@@ -65,6 +71,7 @@ void editor_destroy_gui_elements()
 	_TMP_DELRES(editorfglayermodebuttonsurface)
 	_TMP_DELRES(editorcdlayermodebuttonsurface)
 	_TMP_DELRES(editorcollisionoverlaysurface)
+	_TMP_DELRES(editorshowselectorbuttonsurface)
 
 	#undef _TMP_DELRES
 }

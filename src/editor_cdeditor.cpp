@@ -6,38 +6,43 @@
 
 void editor_set_tile_cdeditor()
 {
+	unsigned int tileindex = editormousetilex + (editormousetiley * editorlevelwidth);
+
 	SDL_Rect dst;
 
-	editorlevel->data[editormousetilex + (editormousetiley * editorlevelwidth)].solid = true;
+	editorlevel->data[tileindex].solid = true;
 
-	dst.x = (editormousetilex * editortilewidth) - 1;
-	dst.y = (editormousetiley * editortileheight) - 1;
+	dst.x = (editormousetilex * editortilewidth);
+	dst.y = (editormousetiley * editortileheight);
 
-	SDL_BlitSurface(editorcollisionoverlaysurface, 0, editorcdmapsurface, &dst);
-
-	//dst.x = (editormousetilex * editortilewidth) - 1;
-	//dst.y = (editormousetiley * editortileheight) - 1;
-	//dst.w = editortilewidth + 2;
-	//dst.h = editortileheight + 2;
-
-	//SDL_FillRect(editorcdmapsurface, &dst, SDL_MapRGB(editorscreen->format, 255, 0, 0));
-
+	SDL_BlitSurface(editortileset, &editortilecoordinates[editorlevel->data[tileindex].backtilevalue], editorbgmapsurface, &dst);
+	if (editorlevel->data[tileindex].foretilevalue)
+	{
+		SDL_BlitSurface(editortileset, &editortilecoordinates[editorlevel->data[tileindex].foretilevalue - 1], editorbgmapsurface, &dst);
+	}
+	dst.x -= 1;
+	dst.y -= 1;
+	SDL_BlitSurface(editorcollisionoverlaysurface, 0, editorbgmapsurface, &dst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void editor_unset_tile_cdeditor()
 {
-	editorlevel->data[editormousetilex + (editormousetiley * editorlevelwidth)].solid = false;
+	unsigned int tileindex = editormousetilex + (editormousetiley * editorlevelwidth);
+
+	editorlevel->data[tileindex].solid = false;
 
 	SDL_Rect dst;
 
-	dst.x = (editormousetilex * editortilewidth) - 1;
-	dst.y = (editormousetiley * editortileheight) - 1;
-	dst.w = editortilewidth + 2;
-	dst.h = editortileheight + 2;
+	dst.x = (editormousetilex * editortilewidth);
+	dst.y = (editormousetiley * editortileheight);
 
-	SDL_FillRect(editorcdmapsurface, &dst, SDL_MapRGB(editorscreen->format, 255, 0, 255));
+	SDL_BlitSurface(editortileset, &editortilecoordinates[editorlevel->data[tileindex].backtilevalue], editorbgmapsurface, &dst);
+	if (editorlevel->data[tileindex].foretilevalue)
+	{
+		SDL_BlitSurface(editortileset, &editortilecoordinates[editorlevel->data[tileindex].foretilevalue - 1], editorbgmapsurface, &dst);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,8 +86,8 @@ void editor_refresh_view_cdeditor()
 {
 	// blit the map
 	SDL_BlitSurface(editorbgmapsurface, editorcamera->inpixels, editorscreen, editorcamera->box);
-	SDL_BlitSurface(editorfgmapsurface, editorcamera->inpixels, editorscreen, editorcamera->box);
-	SDL_BlitSurface(editorcdmapsurface, editorcamera->inpixels, editorscreen, editorcamera->box);
+	//SDL_BlitSurface(editorfgmapsurface, editorcamera->inpixels, editorscreen, editorcamera->box);
+	//SDL_BlitSurface(editorcdmapsurface, editorcamera->inpixels, editorscreen, editorcamera->box);
 }
 
 

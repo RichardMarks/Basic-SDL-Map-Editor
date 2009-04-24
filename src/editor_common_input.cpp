@@ -285,35 +285,48 @@ void editor_handle_input_common()
 			// what mode button did we click?
 			static unsigned int button[] =
 			{
-				4 + EDITORGUIBUTTONPANELX,
-				8 + EDITORGUIBUTTONPANELY,
-				4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
-				8 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT,
+				  4 + EDITORGUIBUTTONPANELX,
+				  6 + EDITORGUIBUTTONPANELY,
+				  4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
+				  6 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT,
 
-				 4 + EDITORGUIBUTTONPANELX,
-				42 + EDITORGUIBUTTONPANELY,
-				 4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
-				42 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT,
+				  4 + EDITORGUIBUTTONPANELX,
+				 38 + EDITORGUIBUTTONPANELY,
+				  4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
+				 38 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT,
 
-				 4 + EDITORGUIBUTTONPANELX,
-				70 + EDITORGUIBUTTONPANELY,
-				 4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
-				70 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT
+				  4 + EDITORGUIBUTTONPANELX,
+				 70 + EDITORGUIBUTTONPANELY,
+				  4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
+				 70 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT,
+
+				  4 + EDITORGUIBUTTONPANELX,
+				102 + EDITORGUIBUTTONPANELY,
+				  4 + EDITORGUIBUTTONPANELX + EDITORGUIBUTTONWIDTH,
+				102 + EDITORGUIBUTTONPANELY + EDITORGUIBUTTONHEIGHT
 			};
 
-			bool btn1 = (mousex >= button[0] && mousex <= button[2] && mousey >= button[1] && mousey <= button[3]);
-			bool btn2 = (mousex >= button[4] && mousex <= button[6] && mousey >= button[5] && mousey <= button[7]);
-			bool btn3 = (mousex >= button[8] && mousex <= button[10] && mousey >= button[9] && mousey <= button[11]);
+			bool btn1 = (mousex >=  button[0] && mousex <= button[2] && mousey >= button[1] && mousey <= button[3]);
+			bool btn2 = (mousex >=  button[4] && mousex <= button[6] && mousey >= button[5] && mousey <= button[7]);
+			bool btn3 = (mousex >=  button[8] && mousex <= button[10] && mousey >= button[9] && mousey <= button[11]);
+			bool btn4 = (mousex >= button[12] && mousex <= button[14] && mousey >= button[13] && mousey <= button[15]);
 
 			if (btn1)
 			{
 				editor_set_mode(EditorBGEdit);
+				editor_create_scene();
 			} else if (btn2)
 			{
 				editor_set_mode(EditorFGEdit);
+				editor_create_scene();
 			} else if (btn3)
 			{
 				editor_set_mode(EditorCDEdit);
+				editor_create_scene();
+			} else if (btn4)
+			{
+				editorshowtileselector = !editorshowtileselector;
+				selector_redraw_tile_selection_panel();
 			}
 		}
 	}

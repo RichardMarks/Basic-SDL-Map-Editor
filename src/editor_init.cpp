@@ -23,6 +23,11 @@ bool editor_init(int argc, char* argv[])
 
 
 	// init SDL
+
+	#ifdef __linux__
+	//putenv("SDL_VIDEODRIVER=glSDL");
+	#endif
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
 		fprintf(stderr, "SDL Library Initialization Failed!\n\tSDL Error: %s\n", SDL_GetError());
@@ -42,7 +47,7 @@ bool editor_init(int argc, char* argv[])
 	}
 
 	// set the window caption
-	SDL_WM_SetCaption("Basic SDL Map Editor v0.0.3 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
+	SDL_WM_SetCaption("Basic SDL Map Editor v0.0.4 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
 
 	// create the SDL event handler instance
 	editorevent = new SDL_Event;
@@ -82,6 +87,22 @@ bool editor_init(int argc, char* argv[])
 	{
 		fprintf(stderr, "SDL_DisplayFormat() failed or we have run out of memory!\n");
 		return false;
+	}
+
+	// pre-calculate all tile coordinates
+	unsigned int tilesperrow 	= (editortileset->w / editortilewidth);
+	unsigned int tilecount 		= ((editortileset->w / editortilewidth) * (editortileset->h / editortileheight));
+	editortilecoordinates 		= new SDL_Rect [tilecount];
+
+	for (unsigned int index = 0; index < tilecount; index++)
+	{
+		int tilemodperrow 	= (index % tilesperrow);
+		int tileoverperrow 	= (index / tilesperrow);
+
+		editortilecoordinates[index].x = 1 + tilemodperrow + (tilemodperrow * editortilewidth);
+		editortilecoordinates[index].y = 1 + tileoverperrow + (tileoverperrow * editortileheight);
+		editortilecoordinates[index].w = editortilewidth;
+		editortilecoordinates[index].h = editortileheight;
 	}
 
 	////////////////////////////////////////////////////////////////////////////

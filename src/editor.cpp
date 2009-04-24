@@ -172,22 +172,14 @@ void editor_printf(int x, int y, unsigned int color, const char* format, ...)
 
 void editor_update_cursor_surface()
 {
-	SDL_Rect src, dst;
-
-	static int tilesperrow = (editortileset->w / editortilewidth);
-
-	int tilemodperrow = (editorcurrentile % tilesperrow);
-	int tileoverperrow = (editorcurrentile / tilesperrow);
-
-	src.x = 1 + tilemodperrow + (tilemodperrow * editortilewidth);
-	src.y = 1 + tileoverperrow + (tileoverperrow * editortileheight);
-	src.w = editortilewidth;
-	src.h = editortileheight;
+	SDL_Rect dst;
 
 	dst.x = 1;
 	dst.y = 1;
-
-	SDL_BlitSurface(editortileset, &src, editorcursorsurface, &dst);
+	dst.w = editortilewidth - 2;
+	dst.h = editortileheight - 2;
+	SDL_FillRect(editorcursorsurface, &dst, 0);
+	SDL_BlitSurface(editortileset, &editortilecoordinates[editorcurrentile], editorcursorsurface, &dst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,6 +208,7 @@ void editor_select_next_tile()
 
 void editor_set_mode(EditorMode mode)
 {
+	editormode = mode;
 	switch(mode)
 	{
 		// assign background editor function pointers
