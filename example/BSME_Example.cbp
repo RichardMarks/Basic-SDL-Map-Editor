@@ -32,9 +32,6 @@
 		<Unit filename="SConstruct">
 			<Option virtualFolder="SCONS BUILD SCRIPTS/" />
 		</Unit>
-		<Unit filename="changes.txt">
-			<Option virtualFolder="Text Files/" />
-		</Unit>
 		<Unit filename="readme.txt">
 			<Option virtualFolder="Text Files/" />
 		</Unit>
