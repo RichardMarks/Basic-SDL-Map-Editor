@@ -10,6 +10,16 @@ void editor_execute()
 
 	while(editorrunning)
 	{
+
+		if (editorlevelchanged)
+		{
+			SDL_WM_SetCaption("Basic SDL Map Editor v0.0.5 [wip.map *** unsaved ***] -- by Richard Marks <ccpsceo@gmail.com>", 0);
+		}
+		else
+		{
+			SDL_WM_SetCaption("Basic SDL Map Editor v0.0.5 [wip.map] -- by Richard Marks <ccpsceo@gmail.com>", 0);
+		}
+
 		while(SDL_PollEvent(editorevent))
 		{
 			if (SDL_QUIT == editorevent->type)
@@ -48,6 +58,11 @@ void editor_execute()
 		editor_handle_input_common();
 		editorhandleinputfunction();
 
+		if (editorshowtileselector)
+		{
+			selector_handle_input();
+		}
+
 		editor_refresh_view_common();
 		editorrefreshviewfunction();
 
@@ -81,7 +96,7 @@ void editor_move_camera_up()
 
 void editor_move_camera_down()
 {
-	if (editorcamera->intiles->y < editorlevelheight - editorcamera->intiles->h)
+	if ((unsigned int)editorcamera->intiles->y < editorlevel->height - editorcamera->intiles->h)
 	{
 		editorcamera->intiles->y++;
 		editorcamera->inpixels->y += editortileheight;
@@ -103,7 +118,7 @@ void editor_move_camera_left()
 
 void editor_move_camera_right()
 {
-	if (editorcamera->intiles->x < editorlevelwidth - editorcamera->intiles->w)
+	if ((unsigned int)editorcamera->intiles->x < editorlevel->width - editorcamera->intiles->w)
 	{
 		editorcamera->intiles->x++;
 		editorcamera->inpixels->x += editortilewidth;
@@ -119,7 +134,34 @@ void editor_load_level()
 		editormapdestroyfunction(editorlevel);
 	}
 
-	editorlevel = editormaploadfunction("wip.map");
+	// load if it exists, and create if it does not
+	FILE* fp = fopen("wip.map", "rb");
+	if (fp)
+	{
+		fclose(fp);
+		editorlevel = editormaploadfunction("wip.map");
+	}
+	else
+	{
+		editorlevel = editormapcreatefunction(editorlevelwidth, editorlevelheight);
+		editor_save_level();
+	}
+
+	// did the size change?
+	if ((editorlevel->width != editorlevelwidth) || (editorlevel->height != editorlevelheight))
+	{
+		// remap the level size
+		editorlevelwidth = editorlevel->width;
+		editorlevelheight = editorlevel->height;
+
+		// recreate the camera
+		editor_create_camera();
+
+		// recreate the map surface
+		editor_create_map_surfaces();
+	}
+
+	editorlevelchanged = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +169,7 @@ void editor_load_level()
 void editor_save_level()
 {
 	editormapsavefunction(editorlevel, "wip.map");
+	editorlevelchanged = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,5 +284,45 @@ void editor_set_mode(EditorMode mode)
 		default: break;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+unsigned int editor_auto_save(unsigned int interval, void* param)
+{
+	// only bother auto saving when the level has actually changed
+	if (editorlevel && editorlevelchanged)
+	{
+		time_t rawtime;
+		tm* timeinfo;
+		char timebuffer[80];
+		char datebuffer[80];
+		char filename[0x200];
+
+		time(&rawtime);
+		timeinfo = localtime(&rawtime);
+		strftime(datebuffer, 80, "%A%d_%m_%Y", timeinfo);
+		strftime(timebuffer, 80, "%I_%M_%S%p", timeinfo);
+		sprintf(filename, "autosaves/%s_%s_wipmap.sav", datebuffer, timebuffer);
+		editormapsavefunction(editorlevel, filename);
+	}
+
+	return interval;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

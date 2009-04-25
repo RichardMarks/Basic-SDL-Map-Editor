@@ -39,9 +39,6 @@ unsigned int editorcameraheight		= 22;
 ////////////////////////////////////////////////////////////////////////////////
 MapFormat* editorlevel				= 0;
 
-//unsigned int editorlevelwidth		= 130; // 4 full "screens" of tiles plus a 2 tile border
-//unsigned int editorlevelheight		= 98;
-
 unsigned int editorlevelwidth		= 122; // 4 full "screens" of tiles plus a 2 tile border
 unsigned int editorlevelheight		= 90;
 
@@ -76,9 +73,6 @@ SDL_Surface* editorcursorsurface				= 0;
 
 
 SDL_Surface* editorbgmapsurface					= 0;
-SDL_Surface* editorfgmapsurface					= 0;
-SDL_Surface* editorcdmapsurface					= 0;
-
 
 SDL_Surface* editorhelptextsurface				= 0;
 SDL_Surface* editorcollisionoverlaysurface		= 0;
@@ -107,11 +101,14 @@ bool editorrunning								= false;
 bool editorshowtileselector						= false;
 bool editormousebclicked						= false;
 bool editormousebdown							= false;
+bool editorlevelchanged							= false;
 
 bool* editorkeywaspressed						= 0;
 unsigned char* editorkeys						= 0;
 
 EditorMode editormode							= EditorBGEdit;
+
+_SDL_TimerID* editorautosavetimerid				= 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // selector
@@ -137,6 +134,9 @@ unsigned int selectormousetiley						= 0;
 
 bool selectorlmbdown								= false;
 bool selectorlmbclicked								= false;
+
+bool selectorrmbdown								= false;
+bool selectorrmbclicked								= false;
 
 int selectormousex									= 0;
 int selectormousey									= 0;

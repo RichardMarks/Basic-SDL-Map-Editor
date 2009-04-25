@@ -1,0 +1,24 @@
+Don't delete this file.
+
+Every 5 minutes the editor will auto save a file into this folder***
+
+
+** only if the map is altered.
+
+When you exit the editor without properly saving after making changes, an autosave will be placed here.
+
+The files are named with a time and date stamp and wipmap.sav
+
+you can copy the file to wip.map and load it back into the editor
+
+
+lets say that you made a mistake, and you've got your autosave backups (obviously more than 5 minutes had to have passed)
+
+then on linux you can do this:
+
+$ cp ./nameofthebackupfile.sav ../wip.map
+
+to overwrite the current wip.map with the backup data and just reload in the editor and you're back in business!
+
+There is no undo, so by keeping your autosaves you can keep a development progress journal.
+

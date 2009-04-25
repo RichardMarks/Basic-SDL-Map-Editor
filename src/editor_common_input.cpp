@@ -11,235 +11,56 @@ void editor_handle_input_common()
 	editorkeys = SDL_GetKeyState(0);
 	editormouseb = SDL_GetMouseState(&editormousex, &editormousey);
 
+	editor_handle_keyboard_input_common();
+
 	unsigned int mousex = (unsigned int) editormousex;
 	unsigned int mousey = (unsigned int) editormousey;
 
 	////////////////////////////////////////////////////////////////////////////
-	// exit the map editor (does NOT save the map first!)
+	// v0.0.5 mouse camera panning controls
 	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_ESCAPE])
+	#if 1
+	if (editorkeys[SDLK_LCTRL] || editorkeys[SDLK_RCTRL])
 	{
-		editorrunning = false;
-	}
+		static unsigned int zone[] =
+		{
+			// top
+			editortilewidth, 0, editortilewidth + editorcamera->inpixels->w, editortileheight,
 
-	////////////////////////////////////////////////////////////////////////////
-	// clears the current map data
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_n])
-	{
-		if (!editorkeywaspressed[SDLK_n])
-		{
-			editorkeywaspressed[SDLK_n] = true;
-		}
-	}
-	else
-	{
-		if (editorkeywaspressed[SDLK_n])
-		{
-			for (unsigned int row = 0; row < editorlevelheight; row++)
-			{
-				for (unsigned int column = 0; column < editorlevelwidth; column++)
-				{
-					unsigned int index = column + (row * editorlevelwidth);
-					editorlevel->data[index].backtilevalue 	= 0;
-					editorlevel->data[index].foretilevalue 	= 0;
-					editorlevel->data[index].solid 			= false;
-				}
-			}
-			editor_create_scene();
-			editorkeywaspressed[SDLK_n] = false;
-		}
-	}
+			// bottom
+			editortilewidth, editortileheight + editorcamera->inpixels->h, editortilewidth + editorcamera->inpixels->w, editorscreen->h,
 
-	////////////////////////////////////////////////////////////////////////////
-	// toggle tile selector panel
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_TAB])
-	{
-		if (!editorkeywaspressed[SDLK_TAB])
-		{
-			editorkeywaspressed[SDLK_TAB] = true;
-		}
-	}
-	else
-	{
-		if (editorkeywaspressed[SDLK_TAB])
-		{
-			if (editormode != EditorCDEdit)
-			{
-				editorshowtileselector = !editorshowtileselector;
-				selector_redraw_tile_selection_panel();
-			}
+			// left
+			0, editortileheight, editortilewidth, editorscreen->h - editortileheight,
 
-			editorkeywaspressed[SDLK_TAB] = false;
-		}
-	}
+			// right
+			editortilewidth + editorcamera->inpixels->w, editortileheight, editorscreen->w, editorscreen->h - editortileheight
+		};
 
-	////////////////////////////////////////////////////////////////////////////
-	// next tile in tileset
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_0])
-	{
-		if (!editorkeywaspressed[SDLK_0])
-		{
-			editorkeywaspressed[SDLK_0] = true;
-		}
-	}
-	else
-	{
-		if (editorkeywaspressed[SDLK_0])
-		{
-			editor_select_next_tile();
-			editorkeywaspressed[SDLK_0] = false;
-		}
-	}
+		bool btn1 = (mousex >=  zone[0] && mousex <= zone[2] && mousey >= zone[1] && mousey <= zone[3]);
+		bool btn2 = (mousex >=  zone[4] && mousex <= zone[6] && mousey >= zone[5] && mousey <= zone[7]);
+		bool btn3 = (mousex >=  zone[8] && mousex <= zone[10] && mousey >= zone[9] && mousey <= zone[11]);
+		bool btn4 = (mousex >= zone[12] && mousex <= zone[14] && mousey >= zone[13] && mousey <= zone[15]);
 
-	////////////////////////////////////////////////////////////////////////////
-	// previous tile in tileset
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_9])
-	{
-		if (!editorkeywaspressed[SDLK_9])
+		if (btn1)
 		{
-			editorkeywaspressed[SDLK_9] = true;
-		}
-	}
-	else
-	{
-		if (editorkeywaspressed[SDLK_9])
-		{
-			editor_select_previous_tile();
-			editorkeywaspressed[SDLK_9] = false;
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// load wip.map
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_F8])
-	{
-		if (!editorkeywaspressed[SDLK_F8])
-		{
-			editorkeywaspressed[SDLK_F8] = true;
-		}
-	}
-	else
-	{
-		if (editorkeywaspressed[SDLK_F8])
-		{
-			editor_load_level();
-			editor_create_scene();
-			editorkeywaspressed[SDLK_F8] = false;
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// save wip.map
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_F5])
-	{
-		if (!editorkeywaspressed[SDLK_F5])
-		{
-			editorkeywaspressed[SDLK_F5] = true;
-		}
-	}
-	else
-	{
-		if (editorkeywaspressed[SDLK_F5])
-		{
-			editor_save_level();
-			editorkeywaspressed[SDLK_F5] = false;
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// scroll up
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_UP] || editorkeys[SDLK_w])
-	{
-		if (editorshowtileselector)
-		{
-			selector_scroll_up();
-		}
-		else
-		{
+			// pan up
 			editor_move_camera_up();
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// jump to first row
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_PAGEUP])
-	{
-		editorcamera->intiles->y = 0;
-		editorcamera->inpixels->y = 0;
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// jump to first column
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_HOME])
-	{
-		editorcamera->intiles->x = 0;
-		editorcamera->inpixels->x = 0;
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// jump to last row
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_PAGEDOWN])
-	{
-		editorcamera->intiles->y = editorlevel->height - editorcamera->intiles->h;
-		editorcamera->inpixels->y = editorcamera->intiles->y * editortileheight;
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// jump to last column
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_END])
-	{
-		editorcamera->intiles->x = editorlevel->width - editorcamera->intiles->w;
-		editorcamera->inpixels->x = editorcamera->intiles->x * editortilewidth;
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// scroll down
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_DOWN] || editorkeys[SDLK_s])
-	{
-		if (editorshowtileselector)
+		} else if (btn2)
 		{
-			selector_scroll_down();
-		}
-		else
-		{
+			// pan down
 			editor_move_camera_down();
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// scroll left
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_LEFT] || editorkeys[SDLK_a])
-	{
-		if (!editorshowtileselector)
+		} else if (btn3)
 		{
+			// pan left
 			editor_move_camera_left();
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// scroll right
-	////////////////////////////////////////////////////////////////////////////
-	if (editorkeys[SDLK_RIGHT] || editorkeys[SDLK_d])
-	{
-		if (!editorshowtileselector)
+		} else if (btn4)
 		{
+			// pan right
 			editor_move_camera_right();
 		}
 	}
-
+	#endif
 
 	////////////////////////////////////////////////////////////////////////////
 	// handle interation with the gui
@@ -348,92 +169,6 @@ void editor_handle_input_common()
 			}
 		}
 	}
-
-
-	////////////////////////////////////////////////////////////////////////////
-	// handle interation with the tile selector panel
-	////////////////////////////////////////////////////////////////////////////
-	if (editorshowtileselector)
-	{
-		// show the mouse cursor if its hidden
-		if (!SDL_ShowCursor(SDL_QUERY))
-		{
-			SDL_ShowCursor(SDL_ENABLE);
-		}
-
-		// if the right mouse button is down, we exit the selector with the currently selected tile
-		if (editormouseb & SDL_BUTTON(3))
-		{
-			editorcurrentile 		= selectortileselected;
-			editorshowtileselector 	= false;
-			selectormouseclicks 	= 0;
-			editor_update_cursor_surface();
-		}
-
-		// if we are over the tile selector panel, then we process the tile selection
-		if (mousex >= editortilewidthx2 && mousex <= editortilewidthx22 && mousey >= editortileheightx2 && mousey <= editortileheightx14)
-		{
-			selectormousetilex 	= ((mousex - editortilewidthx2) / editortilewidth);
-			selectormousetiley 	= (selectorscroll / editortileheight) + ((mousey - editortileheightx2) / editortileheight);
-			selectormousex 		= mousex;
-			selectormousey 		= mousey;
-
-			#if 1
-			// if we have not clicked already
-			if (!selectorlmbclicked)
-			{
-				// check for left mouse button being down
-				if (editormouseb & SDL_BUTTON(1))
-				{
-					// its down
-					selectorlmbdown = true;
-				}
-
-				// check for left mouse button being up
-				if (!(editormouseb & SDL_BUTTON(1)))
-				{
-					// its up
-					if (selectorlmbdown)
-					{
-						// we clicked
-						selectorlmbclicked 	= true;
-						selectorlmbdown 	= false;
-					}
-				}
-			}
-			else
-			{
-				// we have clicked
-				selectorlmbclicked	= false;
-				selectorlmbdown		= false;
-
-				if (!selectormouseclicks)
-				{
-					// no clicks, so lets select the tile and up the click count
-					selectortileselected = selectortileundermouse;
-					selectormouseclicks++;
-				}
-				else
-				{
-					//
-					if (selectortileundermouse != selectortileselected)
-					{
-						selectormouseclicks 	= 1;
-						selectortileselected 	= selectortileundermouse;
-					}
-					else
-					{
-						editorcurrentile 			= selectortileselected;
-						editorshowtileselector 		= false;
-						selectormouseclicks 		= 0;
-						editor_update_cursor_surface();
-					}
-				}
-			}
-			#endif
-		}
-	}
-
 }
 
 

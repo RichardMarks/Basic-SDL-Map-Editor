@@ -59,10 +59,12 @@ void editor_handle_input_fgeditor()
 			if (editormouseb & SDL_BUTTON(1))
 			{
 				editorsettilefunction();
+				editorlevelchanged = true;
 			}
 			else if (editormouseb & SDL_BUTTON(3))
 			{
 				editorunsettilefunction();
+				editorlevelchanged = true;
 			}
 		}
 		else

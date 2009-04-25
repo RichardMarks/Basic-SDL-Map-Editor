@@ -6,6 +6,11 @@
 
 void editor_create_camera()
 {
+	if (editorcamera)
+	{
+		editor_destroy_camera();
+	}
+
 	editorcamera = new EditorCamera;
 	if (!editorcamera)
 	{
@@ -25,8 +30,24 @@ void editor_create_camera()
 
 	editorcamera->intiles->x = 1;
 	editorcamera->intiles->y = 1;
-	editorcamera->intiles->w = 30;
-	editorcamera->intiles->h = 22;
+
+	// calculate the max number of tiles that we can view
+	unsigned int maxtilesacross = (editorwindowwidth / editortilewidth) - 2;
+	unsigned int maxtilesdown = (editorwindowheight / editortileheight) - 2;
+
+	editorcamera->intiles->w = maxtilesacross; // 30;
+	editorcamera->intiles->h = maxtilesdown; // 22;
+
+	// make sure that small maps are still viewable
+	if (editorlevel->width < editorcamera->intiles->w)
+	{
+		editorcamera->intiles->w = editorlevel->width;
+	}
+
+	if (editorlevel->height < editorcamera->intiles->h)
+	{
+		editorcamera->intiles->h = editorlevel->height;
+	}
 
 	editorcamera->inpixels->x = editortilewidth;
 	editorcamera->inpixels->y = editortileheight;
@@ -37,6 +58,9 @@ void editor_create_camera()
 	editorcamera->box->y = editortileheight;
 	editorcamera->box->w = editorcamera->inpixels->w + editortilewidth;
 	editorcamera->box->h = editorcamera->inpixels->h + editortileheight;
+
+	editorcameraxlimit = editortilewidth * (editorcamera->intiles->w + 1);
+	editorcameraylimit = editortileheight * (editorcamera->intiles->h + 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,34 +70,20 @@ void editor_create_map_surfaces()
 	unsigned int width = editorlevelwidth * editortilewidth;
 	unsigned int height = editorlevelheight * editortileheight;
 
-	#if 1
+	if (editorbgmapsurface)
+	{
+		SDL_FreeSurface(editorbgmapsurface);
+		editorbgmapsurface = 0;
+	}
+
 	editorbgmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	//editorfgmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
-	//editorcdmapsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY, width, height, editorscreen->format->BitsPerPixel, 0, 0, 0, 0);
+	SDL_Surface* t = SDL_DisplayFormat(editorbgmapsurface); SDL_FreeSurface(editorbgmapsurface); editorbgmapsurface = t;
 
-	SDL_Surface* t;
-	t = SDL_DisplayFormat(editorbgmapsurface); SDL_FreeSurface(editorbgmapsurface); editorbgmapsurface = t;
-	//t = SDL_DisplayFormat(editorfgmapsurface); SDL_FreeSurface(editorfgmapsurface); editorfgmapsurface = t;
-	//t = SDL_DisplayFormat(editorcdmapsurface); SDL_FreeSurface(editorcdmapsurface); editorcdmapsurface = t;
-
-	#endif
-
-
-	//if (!editorbgmapsurface || !editorfgmapsurface || !editorcdmapsurface)
 	if (!editorbgmapsurface)
 	{
 		fprintf(stderr, "Unable to create the map surface!\nSDL Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-
-	//SDL_FillRect(editorcdmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-	//SDL_FillRect(editorfgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-
-	//const unsigned int transparent = SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF);
-
-	//SDL_SetColorKey(editorfgmapsurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), transparent);
-	//SDL_SetColorKey(editorcdmapsurface, (SDL_SRCCOLORKEY | SDL_RLEACCEL), transparent);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,12 +92,8 @@ void editor_create_scene()
 {
 	#if 1
 	SDL_FillRect(editorbgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0x00, 0x00, 0x00));
-	//SDL_FillRect(editorfgmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
-	//SDL_FillRect(editorcdmapsurface, 0, SDL_MapRGB(editorscreen->format, 0xFF, 0x00, 0xFF));
 
 	SDL_Rect src, dst;
-
-	//unsigned int tilesperrow = (editortileset->w / editortilewidth);
 
 	src.w = editortilewidth;
 	src.h = editortileheight;
@@ -126,23 +132,26 @@ void editor_create_scene()
 	}
 
 	// cd
-	for (unsigned int row = 0; row < editorlevel->height; row++)
+	if (editormode == EditorCDEdit)
 	{
-		dst.y = row * editortileheight;
-		for (unsigned int column = 0; column < editorlevel->width; column++)
+		for (unsigned int row = 0; row < editorlevel->height; row++)
 		{
-			dst.x = column * editortilewidth;
+			dst.y = row * editortileheight;
+			for (unsigned int column = 0; column < editorlevel->width; column++)
+			{
+				dst.x = column * editortilewidth;
 
-			if (!editorlevel->data[column + (row * editorlevel->width)].solid)
-			{
-				continue;
-			}
-			else
-			{
-				SDL_Rect plot;
-				plot.x = dst.x - 1;
-				plot.y = dst.y - 1;
-				SDL_BlitSurface(editorcollisionoverlaysurface, 0, editorbgmapsurface, &plot);
+				if (!editorlevel->data[column + (row * editorlevel->width)].solid)
+				{
+					continue;
+				}
+				else
+				{
+					SDL_Rect plot;
+					plot.x = dst.x - 1;
+					plot.y = dst.y - 1;
+					SDL_BlitSurface(editorcollisionoverlaysurface, 0, editorbgmapsurface, &plot);
+				}
 			}
 		}
 	}
@@ -153,16 +162,15 @@ void editor_create_scene()
 
 void editor_create_static_help_text()
 {
-	editorhelptextrenderx = 4 + editortilewidth;
-	editorhelptextrendery = 5 + editortileheight + editorcamera->inpixels->h;
-
 	SDL_Color color;
 	color.r = 255;
 	color.g = 255;
 	color.b = 255;
 	editorhelptextsurface = TTF_RenderText_Solid(editorfont,
-	"Press N to clear map, F5 to save, F8 to load, W, S, A, D, or Arrow Keys to scroll the camera, "
-		"TAB, ( or ) to select a tile.            (C) Copyright 2009, Richard Marks <ccpsceo@gmail.com>", color);
+	"(C) Copyright 2009, Richard Marks <ccpsceo@gmail.com>", color);
+
+	editorhelptextrenderx = 4 + editortilewidth;
+	editorhelptextrendery = editorscreen->h - (editorhelptextsurface->h + 4);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

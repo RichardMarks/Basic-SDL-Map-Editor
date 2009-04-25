@@ -2,3 +2,20 @@
 # Basic SDL Map Editor
 # developed by Richard Marks <ccpsceo@gmail.com>
 
+The changes from v0.0.4 to v0.0.5 are as follows:
+
+* the camera will pan when you move the mouse to any of the four edges surrounding the view and hold CTRL
+* The S and L keys will save and load the map respectively
+* the wsad and arrow key pan controls were removed as deemed unnecesary
+* the ( and ) key controls were removed since the mouse-wheel will serve the same purpose.
+* every 5 minutes the map will be automatically saved to a XXX_wipmap.sav where XXX is a special timestamp format
+* when you exit the editor, the map will be saved.
+* when the editor starts it will create a new blank wip.map file if it cannot find one to load.
+* auto saving is only enabled when you alter the map. that way you aren't autosaving an unchanged map.
+* fixed bug in tile selector that caused you to accidentally alter the map when closing the selector with right-clicking.
+
+
+================================================================================
+
+The changes from v0.0.1 thru v0.0.4 were unfortunately not properly documented.
+

@@ -256,7 +256,130 @@ void selector_redraw_tile_selection_panel()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void selector_handle_input()
+{
+	unsigned int mousex = (unsigned int) editormousex;
+	unsigned int mousey = (unsigned int) editormousey;
+
+	////////////////////////////////////////////////////////////////////////////
+	// scroll selector up and down
+	////////////////////////////////////////////////////////////////////////////
+	if (editorkeys[SDLK_UP]) { selector_scroll_up(); }
+	if (editorkeys[SDLK_DOWN]) { selector_scroll_down(); }
 
 
+	////////////////////////////////////////////////////////////////////////////
+	// handle interation with the tile selector panel
+	////////////////////////////////////////////////////////////////////////////
+
+	// show the mouse cursor if its hidden
+	if (!SDL_ShowCursor(SDL_QUERY))
+	{
+		SDL_ShowCursor(SDL_ENABLE);
+	}
+
+	// if the right mouse button is down, we exit the selector with the currently selected tile
+
+	// if we have not clicked already
+	if (!selectorrmbclicked)
+	{
+		// check for right mouse button being down
+		if (editormouseb & SDL_BUTTON(3))
+		{
+			// its down
+			selectorrmbdown = true;
+		}
+
+		// check for right mouse button being up
+		if (!(editormouseb & SDL_BUTTON(3)))
+		{
+			// its up
+			if (selectorrmbdown)
+			{
+				// we clicked
+				selectorrmbclicked 	= true;
+				selectorrmbdown 	= false;
+			}
+		}
+	}
+	else
+	{
+		// we have clicked
+		selectorrmbclicked	= false;
+		selectorrmbdown		= false;
+
+
+		editorcurrentile 		= selectortileselected;
+		editorshowtileselector 	= false;
+		selectormouseclicks 	= 0;
+		editor_update_cursor_surface();
+		SDL_Delay(500);
+	}
+
+	// if we are over the tile selector panel, then we process the tile selection
+	if (mousex >= editortilewidthx2 && mousex <= editortilewidthx22 && mousey >= editortileheightx2 && mousey <= editortileheightx14)
+	{
+		selectormousetilex 	= ((mousex - editortilewidthx2) / editortilewidth);
+		selectormousetiley 	= (selectorscroll / editortileheight) + ((mousey - editortileheightx2) / editortileheight);
+		selectormousex 		= mousex;
+		selectormousey 		= mousey;
+
+		#if 1
+		// if we have not clicked already
+		if (!selectorlmbclicked)
+		{
+			// check for left mouse button being down
+			if (editormouseb & SDL_BUTTON(1))
+			{
+				// its down
+				selectorlmbdown = true;
+			}
+
+			// check for left mouse button being up
+			if (!(editormouseb & SDL_BUTTON(1)))
+			{
+				// its up
+				if (selectorlmbdown)
+				{
+					// we clicked
+					selectorlmbclicked 	= true;
+					selectorlmbdown 	= false;
+				}
+			}
+		}
+		else
+		{
+			// we have clicked
+			selectorlmbclicked	= false;
+			selectorlmbdown		= false;
+
+			if (!selectormouseclicks)
+			{
+				// no clicks, so lets select the tile and up the click count
+				selectortileselected = selectortileundermouse;
+				selectormouseclicks++;
+			}
+			else
+			{
+				//
+				if (selectortileundermouse != selectortileselected)
+				{
+					selectormouseclicks 	= 1;
+					selectortileselected 	= selectortileundermouse;
+				}
+				else
+				{
+					editorcurrentile 			= selectortileselected;
+					editorshowtileselector 		= false;
+					selectormouseclicks 		= 0;
+					editor_update_cursor_surface();
+				}
+			}
+		}
+		#endif
+	}
+}
 
 

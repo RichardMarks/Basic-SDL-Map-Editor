@@ -6,6 +6,14 @@
 
 void editor_destroy()
 {
+	// autosave the map on exit
+	editor_auto_save(0, 0);
+
+	if (SDL_TRUE != SDL_RemoveTimer(editorautosavetimerid))
+	{
+		fprintf(stderr, "warning.. the autosave timer was unable to be removed!\n");
+	}
+
 	// release any newd objects ^-^
 	#define _TMP_DELRES(o) if (o){delete o;o=0;}
 
@@ -21,8 +29,6 @@ void editor_destroy()
 
 	_TMP_DELRES(editorhelptextsurface)
 	_TMP_DELRES(editorbgmapsurface)
-	//_TMP_DELRES(editorfgmapsurface)
-	//_TMP_DELRES(editorcdmapsurface)
 
 	#undef _TMP_DELRES
 

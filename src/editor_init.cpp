@@ -112,6 +112,7 @@ bool editor_init(int argc, char* argv[])
 	editortextcolor = SDL_MapRGB(editorscreen->format, 255, 255, 255);
 
 	editor_load_level();
+	editorlevelchanged = false;
 
 	editor_create_camera();
 
@@ -130,13 +131,15 @@ bool editor_init(int argc, char* argv[])
 		editorkeywaspressed[index] = false;
 	}
 
-
 	if (!selector_init(editortileset))
 	{
 		return false;
 	}
 
 	editor_set_mode(EditorBGEdit);
+
+	// every 5 minutes we attempt an auto save
+	editorautosavetimerid = SDL_AddTimer(300000, editor_auto_save, 0);
 
 	editorrunning = true;
 	return true;

@@ -8,17 +8,12 @@
 struct SDL_Surface;
 struct SDL_Rect;
 
-extern bool selector_init(SDL_Surface* tileset);
-extern void selector_destroy();
-extern void selector_scroll_up();
-extern void selector_scroll_down();
-extern void selector_refresh_view();
-
-extern void selector_create_tile_selection_panel();
-extern void selector_redraw_tile_selection_panel();
 
 extern bool selectorlmbdown;
 extern bool selectorlmbclicked;
+extern bool selectorrmbdown;
+extern bool selectorrmbclicked;
+
 extern unsigned int selectormouseclicks;
 extern unsigned int selectortileundermouse;
 extern unsigned int selectortileselected;
@@ -38,4 +33,14 @@ extern SDL_Surface* selectorhelptextsurface;
 
 extern SDL_Rect* selectorpanelview;
 
+extern bool selector_init(SDL_Surface* tileset);
+extern void selector_destroy();
+extern void selector_scroll_up();
+extern void selector_scroll_down();
+extern void selector_refresh_view();
+
+extern void selector_create_tile_selection_panel();
+extern void selector_redraw_tile_selection_panel();
+
+extern void selector_handle_input();
 #endif

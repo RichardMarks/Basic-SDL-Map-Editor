@@ -10,6 +10,7 @@ union SDL_Event;
 struct SDL_Surface;
 struct SDL_Rect;
 struct _TTF_Font;
+struct _SDL_TimerID;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -58,8 +59,6 @@ extern SDL_Surface* editorscreen;
 extern SDL_Surface* editortileset;
 
 extern SDL_Surface* editorbgmapsurface;
-extern SDL_Surface* editorfgmapsurface;
-extern SDL_Surface* editorcdmapsurface;
 
 extern SDL_Surface* editorhelptextsurface;
 extern SDL_Surface* editormodebuttonpanelsurface;
@@ -121,11 +120,13 @@ extern bool* editorkeywaspressed;
 
 extern bool editorshowtileselector;
 extern bool editorrunning;
-
 extern bool editormousebclicked;
 extern bool editormousebdown;
+extern bool editorlevelchanged;
 
 extern EditorMode editormode;
+
+extern _SDL_TimerID* editorautosavetimerid;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -191,5 +192,9 @@ extern void editor_set_mode(EditorMode mode);
 extern void editor_refresh_view_common();
 extern void editor_handle_input_common();
 
+extern void editor_handle_keyboard_input_common();
+
+
+extern unsigned int editor_auto_save(unsigned int interval, void* param);
 
 #endif
